@@ -186,18 +186,9 @@ function animate() {   //動畫
 	arToolkitContext.update( arToolkitSource.domElement )
 	var dt = 0.2;
 	var maxOmega = 10;
-	if (isActive) {
-		omega = omega +0.5*dt;  
-	} 
-	else {
-  	omega = omega - 0.15*dt;    
-	}
-	omega = clamp (omega, 0, maxOmega);
-  
-	angle += omega*dt;
-	group.rotation.z = angle;  //迴轉角度(徑度)
-	requestAnimationFrame(animate);
-	render();
+	
+	
+	
 	
 	a=angle%(2*Math.PI);
 	
@@ -213,7 +204,17 @@ function animate() {   //動畫
 	{
 		$('#text').css ('color', 'blue');
 	}
-
+	if (isActive) {
+		omega = omega +0.5*dt;  
+	} 
+	else {
+  	omega = omega - 0.15*dt;    
+	}
+	omega = clamp (omega, 0, maxOmega);
+  
+	angle += omega*dt;
+	group.rotation.z = angle;  //迴轉角度(徑度)
+	render();
   
 }
 
