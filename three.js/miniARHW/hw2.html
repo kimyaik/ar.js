@@ -138,19 +138,19 @@ function addMarkerHiro(){
 	group2 = new THREE.Group();
     scene.add (group);//加入圓
     scene.add (group2);//加入圓
-	let geometry0 = new THREE.CircleGeometry( 6, 32, Math.PI/2,2*Math.PI/3);//圓的幾何 
+	let geometry0 = new THREE.CircleGeometry( 2, 32, Math.PI/2,2*Math.PI/3);//圓的幾何 
 
 	let material0 = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide} );//材質
 	let circle0 = new THREE.Mesh( geometry0, material0 );//設定幾何形狀和材質
 	group.add( circle0 );  
 
-	let geometry1 = new THREE.CircleGeometry( 6, 32, Math.PI/2 + 2/3*Math.PI,2*Math.PI/3); 
+	let geometry1 = new THREE.CircleGeometry( 2, 32, Math.PI/2 + 2/3*Math.PI,2*Math.PI/3); 
 	
 	let material1 = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	let circle1 = new THREE.Mesh( geometry1, material1 );
 	group.add( circle1 );  
    
-	let geometry2 = new THREE.CircleGeometry( 6, 32, Math.PI/2 - 2/3*Math.PI,2*Math.PI/3); 
+	let geometry2 = new THREE.CircleGeometry( 2, 32, Math.PI/2 - 2/3*Math.PI,2*Math.PI/3); 
 	
 	let material2 = new THREE.MeshBasicMaterial( { color: 0x00ffff } );
 	let circle2 = new THREE.Mesh( geometry2, material2 );
@@ -158,7 +158,7 @@ function addMarkerHiro(){
 	group.rotation.x=-2.5*Math.PI;
 	
 	
-	let geometry3 = new THREE.ConeGeometry(1,5,6); //箭頭
+	let geometry3 = new THREE.ConeGeometry(0.3,0.5,0.6); //箭頭
 	let material3 = new THREE.MeshBasicMaterial({color:0x000000});
 	let pointer = new THREE.Mesh(geometry3,material3);
 	group2.add(pointer);
