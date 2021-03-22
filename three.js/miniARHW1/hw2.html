@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+<!-- three.js library -->
+<script src='../examples/vendor/three.js/build/three.min.js'></script>
+<script src="../examples/vendor/three.js/examples/js/libs/stats.min.js"></script>
+<!-- ar.js -->
+<script src="../build/ar.js"></script>
+<script>THREEx.ArToolkitContext.baseURL = '../'</script>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js">
+</script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<br>
+ <button id="toggle" style="width:20%">Toggle Turn</button>
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+<div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
+<a href="https://github.com/jeromeetienne/AR.js/" target="_blank">AR.js</a>
+	 - three.js<br>
+	Minimal Version<br>
+	
+	<p id="text" style ="color:red;text-align:center;margin-right:48%;margin-left:48%;">
+	color
+	</p>
+</div>
+
+
+
+<script>
+
+
+// global variables
+
+var stats;
+var arToolKitSource, arToolKitContext;
+var markerHiro;
+
+var camera, scene, renderer;
+var mesh, angle = 0,
+  turn = false;
+var omega = 0;  // angular velocity
+var isActive = false;
+var group;
+var theta=0;
+
+
+init();
+animate();
+
+$("#toggle").click(function() {
+  isActive = ! isActive;
+});
+
+function init() {
+
+	// init renderer
+	renderer	= new THREE.WebGLRenderer({
+		// antialias	: true,
+		alpha: true
+	});
+	renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+	// renderer.setPixelRatio( 1/2 );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.domElement.style.position = 'absolute'
+	renderer.domElement.style.top = '0px'
+	renderer.domElement.style.left = '0px'
+	document.body.appendChild( renderer.domElement );
+
+	stats = new Stats();
+	document.body.appendChild( stats.dom );
+
+	// init scene and camera
+	scene	= new THREE.Scene();
+	
+	// Create a BASIC camera
+	camera = new THREE.Camera();
+	scene.add(camera);
+
+	////////////////////////////////////////////////////////////////////////////////
+	//          handle arToolkitSource
+	////////////////////////////////////////////////////////////////////////////////
+
+	arToolkitSource = new THREEx.ArToolkitSource({
+		// to read from the webcam 
+		sourceType : 'webcam',
+	})
+
+	arToolkitSource.init(function onReady(){
+		onResize()
+	})
+	
+	// handle resize
+	window.addEventListener('resize', function(){
+		onResize()
+	})
+	function onResize(){
+		arToolkitSource.onResize()	
+		arToolkitSource.copySizeTo(renderer.domElement)	
+		if( arToolkitContext.arController !== null ){
+			arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
+		}	
+	}
+	////////////////////////////////////////////////////////////////////////////////
+	//          initialize arToolkitContext
+	////////////////////////////////////////////////////////////////////////////////
+	
+	arToolkitContext = new THREEx.ArToolkitContext({
+		cameraParametersUrl: THREEx.ArToolkitContext.baseURL + '../data/data/camera_para.dat',
+		detectionMode: 'mono',
+		maxDetectionRate: 30,
+		canvasWidth: 80*3,
+		canvasHeight: 60*3,
+	})
+	// initialize it
+	arToolkitContext.init(function onCompleted(){
+		// copy projection matrix to camera
+		camera.projectionMatrix.copy( arToolkitContext.getProjectionMatrix() );
+	})
+
+	markerHiro = addMarkerHiro();
+	scene.add (markerHiro); 
+	
+}
+	
+function addMarkerHiro(){
+	let markerRoot = new THREE.Group()
+
+	var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+		type : 'pattern',
+		patternUrl : THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
+	})
+	
+////////////////////////////////////////////////////////////////  
+  //var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');//網格
+  //markerRoot.add(gridXZ);//加入網格
+ 
+    group = new THREE.Group();
+	group2 = new THREE.Group();
+    scene.add (group);//加入圓
+    scene.add (group2);//加入圓
+	let geometry0 = new THREE.CircleGeometry( 6, 32, Math.PI/2,2*Math.PI/3);//圓的幾何 
+
+	let material0 = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide} );//材質
+	let circle0 = new THREE.Mesh( geometry0, material0 );//設定幾何形狀和材質
+	group.add( circle0 );  
+
+	let geometry1 = new THREE.CircleGeometry( 6, 32, Math.PI/2 + 2/3*Math.PI,2*Math.PI/3); 
+	
+	let material1 = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+	let circle1 = new THREE.Mesh( geometry1, material1 );
+	group.add( circle1 );  
+   
+	let geometry2 = new THREE.CircleGeometry( 6, 32, Math.PI/2 - 2/3*Math.PI,2*Math.PI/3); 
+	
+	let material2 = new THREE.MeshBasicMaterial( { color: 0x00ffff } );
+	let circle2 = new THREE.Mesh( geometry2, material2 );
+	group.add( circle2 );  
+	group.rotation.x=-2.5*Math.PI;
+	
+	
+	let geometry3 = new THREE.ConeGeometry(1,5,6); //箭頭
+	let material3 = new THREE.MeshBasicMaterial({color:0x000000});
+	let pointer = new THREE.Mesh(geometry3,material3);
+	group2.add(pointer);
+	group2.position.set(0,0,-1.5);
+	group2.rotation.x=2.5*Math.PI;
+	
+	markerRoot.add(group);
+	markerRoot.add(group2);
+	return markerRoot;
+	}	
+
+function clamp (x, xLo, xHi) {
+	if (x < xLo) return xLo;
+	if (x > xHi) return xHi;
+		else return x;
+	}
+
+function animate() {   //動畫
+	requestAnimationFrame (animate);
+	stats.update();
+	
+	if( arToolkitSource.ready === false )	return
+	arToolkitContext.update( arToolkitSource.domElement )
+	var dt = 0.2;
+	var maxOmega = 10;
+	if (isActive) {
+		omega = omega +0.5*dt;  
+	} 
+	else {
+  	omega = omega - 0.15*dt;    
+	}
+	omega = clamp (omega, 0, maxOmega);
+  
+	angle += omega*dt;
+	group.rotation.z = angle;  //迴轉角度(徑度)
+	requestAnimationFrame(animate);
+	render();
+	
+	a=angle%(2*Math.PI);
+	
+	if(0< a && a< (1/3*(2*Math.PI)))
+	{
+		$('#text').css ('color', 'yellow'); 
+	}
+	else if((1/3*(2*Math.PI))< a && a<((2/3*(2*Math.PI))) )
+	{
+		$('#text').css ('color', 'red');
+	}
+	else 
+	{
+		$('#text').css ('color', 'blue');
+	}
+
+  
+}
+
+function render() {
+
+  renderer.render(scene, camera);
+
+}
+
+
+
+</script></body>
