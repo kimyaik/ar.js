@@ -12,7 +12,7 @@
 </script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <br>
- <button id="toggle" style="width:20%">Toggle Turn</button>
+ <button id="toggle" style="width:50%">Toggle Turn</button>
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
 <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
 <a href="https://github.com/jeromeetienne/AR.js/" target="_blank">AR.js</a>
@@ -158,11 +158,11 @@ function addMarkerHiro(){
 	group.rotation.x=-2.5*Math.PI;
 	
 	
-	let geometry3 = new THREE.ConeGeometry(0.3,0.5,0.6); //箭頭
+	let geometry3 = new THREE.ConeGeometry(0.5,1.5,4); //箭頭
 	let material3 = new THREE.MeshBasicMaterial({color:0x000000});
 	let pointer = new THREE.Mesh(geometry3,material3);
 	group2.add(pointer);
-	group2.position.set(0,0,-1.5);
+	group2.position.set(0,0,-2.5);
 	group2.rotation.x=2.5*Math.PI;
 	
 	markerRoot.add(group);
